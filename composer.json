@@ -1,0 +1,47 @@
+{
+    "name": "akrabat/slim-bookshelf-api",
+    "description": "An API built with Slim Framework",
+    "license": "BSD-3-Clause",
+    "require": {
+        "php": "^7.0",
+        "slim/slim": "^3.7",
+        "monolog/monolog": "^1.22",
+        "doctrine/migrations": "^1.5",
+        "akrabat/rka-content-type-renderer": "^0.7.2",
+        "nocarrier/hal": "^0.9.12",
+        "crell/api-problem": "^2.0",
+        "zendframework/zend-inputfilter": "^2.7.2",
+        "zendframework/zend-servicemanager": "^3.2",
+        "bshaffer/oauth2-server-php": "^1.9"
+    },
+    "config": {
+        "optimize-autoloader": true
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7",
+        "squizlabs/php_codesniffer": "^2.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/App/",
+            "Auth\\": "src/Auth/",
+            "Science\\": "src/Science/",
+            "Error\\": "src/Error/"
+        }
+    },
+    "scripts": {
+        "migrations": "php vendor/bin/doctrine-migrations ",
+        "generate-migration": "php vendor/bin/doctrine-migrations migrations:generate",
+        "migrate": "php vendor/bin/doctrine-migrations migrations:migrate",
+        "seed": "php vendor/bin/doctrine-migrations seed:rcopmon",
+        "test": "php vendor/phpunit/phpunit/phpunit",
+        "phpcs": "php vendor/bin/phpcs -p"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AppTest\\": "test/unit/AppTest/",
+            "BookshelfTest\\": "test/unit/BookshelfTest/",
+            "ErrorTest\\": "test/unit/ErrorTest/"
+        }
+    }
+}

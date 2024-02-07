@@ -1,0 +1,25 @@
+<phpunit
+    bootstrap="test/bootstrap.php"
+    colors="true"
+>
+    <testsuites>
+        <testsuite name="Bookself API tests">
+            <directory>./test/AppTest</directory>
+            <directory>./test/BookshelfTest</directory>
+            <directory>./test/ErrorTest</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src/App</directory>
+            <directory suffix=".php">src/Bookshelf</directory>
+            <directory suffix=".php">src/Error</directory>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <!-- <log type="coverage-html" target="build/coverage" /> -->
+        <!-- <log type="coverage-text" target="php://stdout" /> -->
+    </logging>
+</phpunit>
