@@ -10,6 +10,7 @@ class Competition
     protected $number;
     protected $status;
     protected $infographic;
+    protected $infographic_block;
     protected  $block_id;
     protected  $block_name;
 
@@ -21,6 +22,7 @@ class Competition
         $this->number = $data['number'] ?? null;
         $this->status = $data['status'] ?? null;
         $this->infographic = $data['infographic'] ?? null;
+        $this->infographic_block = $data['infographic_block'] ?? null;
         $this->block_id = $data['block_id'] ?? null;
         $this->block_name = $data['block_name'] ?? null;
     }
@@ -34,6 +36,7 @@ class Competition
             'number' => $this->number,
             'status' => $this->status,
             'infographic' => $this->infographic,
+            'infographic_block' => $this->infographic_block,
             'block_id' => $this->block_id,
             'block_name' => $this->block_name
         ];

@@ -39,7 +39,7 @@ class StructureMapper
             $openCompetition = isset($openCompetitions[0]) ? $openCompetitions[0] : null ;
             if (!is_null($openCompetition)) {
                 $values = $openCompetition->getArrayCopy();
-                $row['infographic'] = $values['status'] == self::STATUS_IN_PROGRESS ? $values['infographic_block']: '' ;
+                $row['infographic'] = $values['infographic_block'];
             } else {
                 $row['infographic'] = '';
             }
@@ -89,7 +89,7 @@ class StructureMapper
         $infographic = '';
 
 
-        if($status == self::STATUS_IN_PROGRESS){
+        if($status == self::STATUS_IN_PROGRESS || $status == self::STATUS_NEW){
             while ($row = $stmt->fetch()) {
                 if ($row['status'] == $status) {
                     return $row['infographic'];
