@@ -10,7 +10,7 @@ return [
 
     // Database adapter
     'db' => [
-        'dsn' => 'mysql:host=localhost;dbname=oic_educations',
+        'dsn' => 'mysql:host=localhost;dbname=oic_educations;charset=utf8',
         'user' => 'homestead',
         'pass' => 'secret',
     ],
