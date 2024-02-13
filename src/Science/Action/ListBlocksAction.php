@@ -35,7 +35,9 @@ class ListBlocksAction
         $parentUser = $this->userMapper->loadByUser($username);
         $user = $this->userMapper->loadById($id_user);
 
-        $blocks = $this->structureMapper->fetchAllBlocks($id_user, $parentUser);
+        $url = $request->getUri()->getBaseUrl().'/image/';
+
+        $blocks = $this->structureMapper->fetchAllBlocks($id_user, $parentUser, $url);
 
 
         $transformer = new BlockTransformer();

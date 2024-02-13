@@ -16,6 +16,7 @@ class StructureMapper
     CONST ROLE_CHILD = '1';
     CONST ROLE_TEACHER = '2';
     CONST FIELD_NAME_INPUT_FILE = 'BaseFileInput';
+    CONST PHOTO_EXT = 'jpg';
 
     public function __construct(Logger $logger, \PDO $db)
     {
@@ -28,21 +29,21 @@ class StructureMapper
      *
      * @return [Author]
      */
-    public function fetchAllBlocks($assigned_user_id, $parentUser)
+    public function fetchAllBlocks($assigned_user_id, $parentUser, $url)
     {
         $sql = "SELECT id,name FROM blocks ORDER BY sort ASC";
         $stmt = $this->db->query($sql);
 
         $results = [];
         while ($row = $stmt->fetch()) {
-           $openCompetitions = $this->fetchCompetitionsByBlock($row['id'], $assigned_user_id, $parentUser->getId(), $parentUser->getRoleId());
-            $openCompetition = isset($openCompetitions[0]) ? $openCompetitions[0] : null ;
-            if (!is_null($openCompetition)) {
-                $values = $openCompetition->getArrayCopy();
-                $row['infographic'] = $values['infographic_block'];
+            $infographic_file = $this->getInfographicForBlock($row['id'], $assigned_user_id);
+
+            if (!empty($infographic_file) && file_exists( __DIR__ . '/../../public/image/' . $infographic_file)) {
+                $row['infographic'] = $url.$infographic_file;
             } else {
                 $row['infographic'] = '';
             }
+
             $results[] = new Block($row);
         }
 
@@ -100,6 +101,56 @@ class StructureMapper
 
 
         return $infographic;
+    }
+
+    public function getInfographicForBlock($id, $assigned_user_id, $url = '') {
+        $sql = "SELECT c.id FROM competitions c
+                INNER JOIN blocks b ON b.id = c.parent_id
+                WHERE parent_id = $id ORDER BY c.sort ASC";
+        $stmt = $this->db->query($sql);
+
+        $photo = '';
+
+        while ($row = $stmt->fetch()) {
+            $status = $this->checkStatus($row['id'], $assigned_user_id);
+
+            if ($status == self::STATUS_IN_PROGRESS) {
+                return $this->getActualPhoto($row['id'], $assigned_user_id);
+            }
+
+
+        }
+
+        return $photo;
+    }
+
+    public function getActualPhoto($id, $assigned_user_id){
+        $sql = "SELECT IFNULL(mfu.status,'new') as status, mfu.modified_user_id ,m.sequence, c.parent_id as block_id FROM modules m
+                INNER JOIN competitions c ON c.id = m.id_competition
+                LEFT JOIN module_flows_users mfu ON (mfu.id_module = m.id AND mfu.assigned_user_id = $assigned_user_id )
+                WHERE m.id_competition = $id ORDER BY m.sequence ASC";
+
+        $stmt = $this->db->query($sql);
+
+        $tab_users['assigned_user_id'] = '';
+        $tab_users['modified_user_id'] = '';
+
+        while ($row = $stmt->fetch()) {
+           $tab_users['block_id'] = $row['block_id'];
+            if ($row['status'] == self::STATUS_NEW || $row['status'] == self::STATUS_IN_PROGRESS) {
+               if ($row['modified_user_id'] == $assigned_user_id) {
+                   if (empty($tab_users['assigned_user_id'])) {
+                       $tab_users['assigned_user_id'] = $row['sequence'];
+                   }
+               } else {
+                   if (empty($tab_users['modified_user_id'])) {
+                       $tab_users['modified_user_id'] = $row['sequence'];
+                   }
+               }
+           }
+        }
+
+        return $tab_users['block_id'] . '_' . $tab_users['assigned_user_id'] . '_' . $tab_users['modified_user_id'] . '.' . self::PHOTO_EXT;
     }
 
 
