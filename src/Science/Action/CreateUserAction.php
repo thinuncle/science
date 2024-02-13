@@ -65,6 +65,6 @@ class CreateUserAction
         $hal = $transformer->transform($user);
 
         $response = $this->renderer->render($request, $response, $hal);
-        return $response->withHeader('Access-Control-Allow-Origin', '*')->withStatus(201);
+        return $response->withStatus(201);
     }
 }
