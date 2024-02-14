@@ -114,6 +114,9 @@ class StructureMapper
         while ($row = $stmt->fetch()) {
             $status = $this->checkStatus($row['id'], $assigned_user_id);
 
+            if ($status == self::STATUS_NEW) {
+                return $id.'_0_0_0.' . self::PHOTO_EXT;
+            }
             if ($status == self::STATUS_IN_PROGRESS) {
                 return $this->getActualPhoto($row['id'], $assigned_user_id);
             }
@@ -125,7 +128,7 @@ class StructureMapper
     }
 
     public function getActualPhoto($id, $assigned_user_id){
-        $sql = "SELECT IFNULL(mfu.status,'new') as status, mfu.modified_user_id ,m.sequence, c.parent_id as block_id FROM modules m
+        $sql = "SELECT IFNULL(mfu.status,'new') as status, mfu.modified_user_id ,m.sequence, c.parent_id as block_id, c.id as competition_id FROM modules m
                 INNER JOIN competitions c ON c.id = m.id_competition
                 LEFT JOIN module_flows_users mfu ON (mfu.id_module = m.id AND mfu.assigned_user_id = $assigned_user_id )
                 WHERE m.id_competition = $id ORDER BY m.sequence ASC";
@@ -135,8 +138,10 @@ class StructureMapper
         $tab_users['assigned_user_id'] = '';
         $tab_users['modified_user_id'] = '';
 
+
         while ($row = $stmt->fetch()) {
            $tab_users['block_id'] = $row['block_id'];
+           $tab_users['competition_id'] = $row['competition_id'];
             if ($row['status'] == self::STATUS_NEW || $row['status'] == self::STATUS_IN_PROGRESS) {
                if ($row['modified_user_id'] == $assigned_user_id) {
                    if (empty($tab_users['assigned_user_id'])) {
@@ -150,7 +155,7 @@ class StructureMapper
            }
         }
 
-        return $tab_users['block_id'] . '_' . $tab_users['assigned_user_id'] . '_' . $tab_users['modified_user_id'] . '.' . self::PHOTO_EXT;
+        return $tab_users['block_id'] . '_' . $tab_users['competition_id'] .'_'. $tab_users['assigned_user_id'] . '_' . $tab_users['modified_user_id'] . '.' . self::PHOTO_EXT;
     }
 
 
