@@ -63,14 +63,14 @@ class StructureMapper
 
             if ($id_role == self::ROLE_CHILD) {
                 $row['status'] = $status;
-                $row['infographic'] = $this->getInfographicForUser($row['id'], $assigned_user_id, $user_id, $status);
+                $row['infographic'] = $row['infographic_block'];
                 $results[] = new Competition($row);
                 //break;
             }
 
             if ($id_role == self::ROLE_TEACHER) {
                 $row['status'] = $status;
-                $row['infographic'] = $this->getInfographicForUser($row['id'], $assigned_user_id, $user_id, $status);
+                $row['infographic'] = $row['infographic_block'];
                 $results[] = new Competition($row);
                 //break;
             }
@@ -140,6 +140,8 @@ class StructureMapper
 
         $tab_users['assigned_user_id'] = '';
         $tab_users['modified_user_id'] = '';
+        $last_sequence['assigned_user_id'] = '';
+        $last_sequence['modified_user_id'] = '';
 
 
         while ($row = $stmt->fetch()) {
@@ -151,16 +153,32 @@ class StructureMapper
                         $tab_users['assigned_user_id'] = $row['sequence'];
                     }
                 } else {
-                    if ($tab_users['modified_user_id'] == '') {
+                    if (!empty($row['modified_user_id']) && $tab_users['modified_user_id'] == '') {
                         $tab_users['modified_user_id'] = $row['sequence'];
                     }
                 }
             }
+
+            if ($row['modified_user_id'] == $assigned_user_id) {
+                $last_sequence['assigned_user_id'] = $row['sequence'];
+            } else {
+                if (!empty($row['modified_user_id'])) {
+                    $last_sequence['modified_user_id'] = $row['sequence'];
+                }
+            }
+        }
+
+        if ($last_sequence['assigned_user_id'] =='') {
+            $last_sequence['assigned_user_id'] = 0;
+        }
+        if ($last_sequence['modified_user_id'] =='') {
+            $last_sequence['modified_user_id'] = 0;
         }
 
         //echo $tab_users['block_id'] . '_' . $tab_users['competition_id'] .'_'. $tab_users['assigned_user_id'] . '_' . $tab_users['modified_user_id'] . '.' . self::PHOTO_EXT;
 
-        return $tab_users['block_id'] . '_' . $tab_users['competition_id'] .'_'. $tab_users['assigned_user_id'] . '_' . $tab_users['modified_user_id'] . '.' . self::PHOTO_EXT;
+
+        return $tab_users['block_id'] . '_' . $tab_users['competition_id'] .'_'. ($tab_users['assigned_user_id'] == '' ?  $last_sequence['assigned_user_id'] : $tab_users['assigned_user_id'] ) . '_' . ($tab_users['modified_user_id'] == '' ?  $last_sequence['modified_user_id'] : $tab_users['modified_user_id'] ) . '.' . self::PHOTO_EXT;
     }
 
 
